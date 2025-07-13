@@ -9,7 +9,7 @@ public:
   void draw() {
     M5Cardputer.Display.setTextSize(Theme::FONT_TITLE);
     M5Cardputer.Display.setTextColor(Theme::TEXT_COLOR);
-    M5Cardputer.Display.setCursor(20, 20);
+    M5Cardputer.Display.setCursor(10, 10);
     M5Cardputer.Display.print(_text);
   }
 

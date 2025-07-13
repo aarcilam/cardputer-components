@@ -6,7 +6,7 @@
 class MenuView : public RoutedView {
 public:
   MenuView() {
-    _menu = new ScrollableMenu(20, 40, 150, 4); // 4 opciones visibles a la vez
+    _menu = new ScrollableMenu(10, 30, M5Cardputer.Display.width() - 20, 3); // 3 opciones visibles a la vez
     _menu->addButton("Saludar", sayHelloCallback);
     _menu->addButton("Otra opcion", otherOptionCallback);
     _menu->addButton("Configuracion", settingsCallback);
