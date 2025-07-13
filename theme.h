@@ -8,6 +8,7 @@ namespace Theme {
   const uint32_t ACCENT_COLOR = 0xBA55D3;       // Orquídea medio
 
   const int FONT_TITLE = 2;
+  const int FONT_HEADER = 1;
   const int FONT_NORMAL = 2; 
   const int PADDING = 6;
 }
