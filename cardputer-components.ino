@@ -45,17 +45,21 @@ void setup() {
 void loop() {
   M5Cardputer.update();
 
-  // if (M5Cardputer.Keyboard.isChange()) {
-  //   String key = M5Cardputer.Keyboard.readString();
+  if (M5Cardputer.Keyboard.isChange()) {
+    M5Cardputer.Keyboard.updateKeysState();
+    auto& word = M5Cardputer.Keyboard.keysState().word;
 
-  //   if (key == "w") {
-  //     menu->selectUp();
-  //   }
-  //   if (key == "s") {
-  //     menu->selectDown();
-  //   }
-  //   if (key == "\n") { // Enter
-  //     menu->activateSelected();
-  //   }
-  // }
+    for (char key : word) {
+      if (key == ';') {
+        menu->selectUp();
+      }
+      if (key == '.') {
+        menu->selectDown();
+      }
+      if (key == '\n' || key == '\r') {
+        menu->activateSelected();
+      }
+    }
+  }
 }
+
