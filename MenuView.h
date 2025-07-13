@@ -1,15 +1,19 @@
 #pragma once
 #include "RoutedView.h"
-#include "Menu.h"
+#include "ScrollableMenu.h"
 #include "Title.h"
 
 class MenuView : public RoutedView {
 public:
   MenuView() {
-    _menu = new Menu(20, 40, 150);
+    _menu = new ScrollableMenu(20, 40, 150, 4); // 4 opciones visibles a la vez
     _menu->addButton("Saludar", sayHelloCallback);
     _menu->addButton("Otra opcion", otherOptionCallback);
     _menu->addButton("Configuracion", settingsCallback);
+    _menu->addButton("Juegos", gamesCallback);
+    _menu->addButton("Herramientas", toolsCallback);
+    _menu->addButton("Sistema", systemCallback);
+    _menu->addButton("Acerca de", aboutCallback);
   }
   
   ~MenuView() {
@@ -54,13 +58,37 @@ public:
     }
   }
   
+  static void gamesCallback() {
+    if (_instance) {
+      _instance->navigate("/games");
+    }
+  }
+  
+  static void toolsCallback() {
+    if (_instance) {
+      _instance->navigate("/tools");
+    }
+  }
+  
+  static void systemCallback() {
+    if (_instance) {
+      _instance->navigate("/system");
+    }
+  }
+  
+  static void aboutCallback() {
+    if (_instance) {
+      _instance->navigate("/about");
+    }
+  }
+  
   // Método para establecer la instancia
   static void setInstance(MenuView* instance) {
     _instance = instance;
   }
   
 private:
-  Menu* _menu;
+  ScrollableMenu* _menu;
   static MenuView* _instance;
 };
 

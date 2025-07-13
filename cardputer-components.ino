@@ -5,12 +5,20 @@
 #include "HelloView.h"
 #include "OtherView.h"
 #include "SettingsView.h"
+#include "GameView.h"
+#include "ToolsView.h"
+#include "SystemView.h"
+#include "AboutView.h"
 
 Router router;
 MenuView* menuView;
 HelloView* helloView;
 OtherView* otherView;
 SettingsView* settingsView;
+GameView* gameView;
+ToolsView* toolsView;
+SystemView* systemView;
+AboutView* aboutView;
 
 void setup() {
   M5Cardputer.begin();
@@ -23,6 +31,10 @@ void setup() {
   helloView = new HelloView();
   otherView = new OtherView();
   settingsView = new SettingsView();
+  gameView = new GameView();
+  toolsView = new ToolsView();
+  systemView = new SystemView();
+  aboutView = new AboutView();
   
   // Configurar la instancia estática de MenuView
   MenuView::setInstance(menuView);
@@ -32,12 +44,20 @@ void setup() {
   router.addRoute("/hello", helloView);
   router.addRoute("/other", otherView);
   router.addRoute("/settings", settingsView);
+  router.addRoute("/games", gameView);
+  router.addRoute("/tools", toolsView);
+  router.addRoute("/system", systemView);
+  router.addRoute("/about", aboutView);
   
   // Configurar las referencias al router en las vistas
   menuView->setRouter(&router);
   helloView->setRouter(&router);
   otherView->setRouter(&router);
   settingsView->setRouter(&router);
+  gameView->setRouter(&router);
+  toolsView->setRouter(&router);
+  systemView->setRouter(&router);
+  aboutView->setRouter(&router);
   
   // Iniciar con la vista del menú
   router.setInitialRoute("/");

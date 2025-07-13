@@ -24,6 +24,11 @@ public:
     if (_callback) _callback();
   }
 
+  void setPosition(int x, int y) {
+    _x = x;
+    _y = y;
+  }
+
   void showClickEffect() {
     // Guardar el estado actual
     auto bg = Theme::PRIMARY_COLOR;
