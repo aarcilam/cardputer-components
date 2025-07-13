@@ -1,14 +1,15 @@
 #pragma once
-#include "View.h"
+#include "RoutedView.h"
 #include "Menu.h"
 #include "Title.h"
 
-class MenuView : public View {
+class MenuView : public RoutedView {
 public:
   MenuView() {
     _menu = new Menu(20, 40, 150);
     _menu->addButton("Saludar", sayHelloCallback);
-    _menu->addButton("Otra opción", otherOptionCallback);
+    _menu->addButton("Otra opcion", otherOptionCallback);
+    _menu->addButton("Configuracion", settingsCallback);
   }
   
   ~MenuView() {
@@ -34,21 +35,22 @@ public:
     }
   }
   
-  void setViews(View* helloView, View* otherView) {
-    _helloView = helloView;
-    _otherView = otherView;
-  }
-  
   // Callbacks estáticos
   static void sayHelloCallback() {
-    if (_instance && _instance->_helloView) {
-      _instance->changeView(_instance->_helloView);
+    if (_instance) {
+      _instance->navigate("/hello");
     }
   }
   
   static void otherOptionCallback() {
-    if (_instance && _instance->_otherView) {
-      _instance->changeView(_instance->_otherView);
+    if (_instance) {
+      _instance->navigate("/other");
+    }
+  }
+  
+  static void settingsCallback() {
+    if (_instance) {
+      _instance->navigate("/settings");
     }
   }
   
@@ -59,8 +61,6 @@ public:
   
 private:
   Menu* _menu;
-  View* _helloView = nullptr;
-  View* _otherView = nullptr;
   static MenuView* _instance;
 };
 

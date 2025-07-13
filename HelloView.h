@@ -1,7 +1,7 @@
 #pragma once
-#include "View.h"
+#include "RoutedView.h"
 
-class HelloView : public View {
+class HelloView : public RoutedView {
 public:
   void draw() override {
     M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
@@ -18,14 +18,7 @@ public:
   
   void handleInput(char key) override {
     if (key == '\n' || key == '\r' || key == 'Enter' || key == 'OK' || key == '/') {
-      changeView(_menuView);
+      goBack();
     }
   }
-  
-  void setMenuView(View* menuView) {
-    _menuView = menuView;
-  }
-  
-private:
-  View* _menuView = nullptr;
 }; 

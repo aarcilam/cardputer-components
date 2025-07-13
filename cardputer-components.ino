@@ -1,14 +1,16 @@
 #include <M5Cardputer.h>
 #include "Theme.h"
-#include "ViewManager.h"
+#include "Router.h"
 #include "MenuView.h"
 #include "HelloView.h"
 #include "OtherView.h"
+#include "SettingsView.h"
 
-ViewManager viewManager;
+Router router;
 MenuView* menuView;
 HelloView* helloView;
 OtherView* otherView;
+SettingsView* settingsView;
 
 void setup() {
   M5Cardputer.begin();
@@ -20,17 +22,25 @@ void setup() {
   menuView = new MenuView();
   helloView = new HelloView();
   otherView = new OtherView();
+  settingsView = new SettingsView();
   
   // Configurar la instancia estática de MenuView
   MenuView::setInstance(menuView);
   
-  // Configurar las referencias entre vistas
-  menuView->setViews(helloView, otherView);
-  helloView->setMenuView(menuView);
-  otherView->setMenuView(menuView);
+  // Configurar el router con las rutas
+  router.addRoute("/", menuView);
+  router.addRoute("/hello", helloView);
+  router.addRoute("/other", otherView);
+  router.addRoute("/settings", settingsView);
+  
+  // Configurar las referencias al router en las vistas
+  menuView->setRouter(&router);
+  helloView->setRouter(&router);
+  otherView->setRouter(&router);
+  settingsView->setRouter(&router);
   
   // Iniciar con la vista del menú
-  viewManager.setCurrentView(menuView);
+  router.setInitialRoute("/");
 }
 
 void loop() {
@@ -41,7 +51,7 @@ void loop() {
     auto& word = M5Cardputer.Keyboard.keysState().word;
 
     for (char key : word) {
-      viewManager.handleInput(key);
+      router.handleInput(key);
     }
   }
 }
