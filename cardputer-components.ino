@@ -1,14 +1,14 @@
 #include <M5Cardputer.h>
-#include "Theme.h"
-#include "Router.h"
-#include "MenuView.h"
-#include "HelloView.h"
-#include "OtherView.h"
-#include "SettingsView.h"
-#include "GameView.h"
-#include "ToolsView.h"
-#include "SystemView.h"
-#include "AboutView.h"
+#include "theme.h"
+#include "core/Router.h"
+#include "views/main/MenuView.h"
+#include "views/main/HelloView.h"
+#include "views/main/OtherView.h"
+#include "views/system/SettingsView.h"
+#include "views/games/GameView.h"
+#include "views/tools/ToolsView.h"
+#include "views/system/SystemView.h"
+#include "views/about/AboutView.h"
 
 Router router;
 MenuView* menuView;
