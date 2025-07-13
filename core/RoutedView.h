@@ -21,9 +21,9 @@ protected:
     }
   }
   
-  void goBack() {
+  void goBack(const String& path = "/") {
     // Por ahora navega al menú principal
-    navigate("/");
+    navigate(path);
   }
   
 private:

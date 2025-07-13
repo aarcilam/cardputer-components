@@ -17,7 +17,7 @@ public:
   }
   
   void handleInput(char key) override {
-    if (key == '\n' || key == '\r' || key == 'Enter' || key == 'OK' || key == '/') {
+    if (key == ',' ) {
       goBack();
     }
   }
