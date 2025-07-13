@@ -56,7 +56,7 @@ void loop() {
       if (key == '.') {
         menu->selectDown();
       }
-      if (key == '\n' || key == '\r') {
+      if (key == '\n' || key == '\r' || key == 'Enter' || key == 'OK' || key == '/') {
         menu->activateSelected();
       }
     }

@@ -24,6 +24,28 @@ public:
     if (_callback) _callback();
   }
 
+  void showClickEffect() {
+    // Guardar el estado actual
+    auto bg = Theme::PRIMARY_COLOR;
+    
+    // Efecto de click: cambiar color de fondo brevemente
+    M5Cardputer.Display.fillRoundRect(_x, _y, _w, _h, 5, Theme::ACCENT_COLOR);
+    M5Cardputer.Display.setTextColor(Theme::TEXT_COLOR);
+    M5Cardputer.Display.setTextSize(Theme::FONT_NORMAL);
+    M5Cardputer.Display.setCursor(_x + 6, _y + 8);
+    M5Cardputer.Display.print(_label);
+    
+    // Pequeña pausa para el efecto visual
+    delay(100);
+    
+    // Restaurar el color original
+    M5Cardputer.Display.fillRoundRect(_x, _y, _w, _h, 5, bg);
+    M5Cardputer.Display.setTextColor(Theme::TEXT_COLOR);
+    M5Cardputer.Display.setTextSize(Theme::FONT_NORMAL);
+    M5Cardputer.Display.setCursor(_x + 6, _y + 8);
+    M5Cardputer.Display.print(_label);
+  }
+
 private:
   int _x, _y, _w, _h;
   String _label;

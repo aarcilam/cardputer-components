@@ -29,6 +29,7 @@ public:
   }
 
   void activateSelected() {
+    _items[_selected]->showClickEffect();
     _items[_selected]->click();
   }
 
