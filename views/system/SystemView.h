@@ -1,6 +1,7 @@
 #pragma once
 #include "../../core/RoutedView.h"
 #include "../../components/ui/title.h"
+#include "../../core/NetworkService.h"
 
 class SystemView : public RoutedView {
 public:
@@ -17,6 +18,12 @@ public:
     
     M5Cardputer.Display.setCursor(20, 100);
     M5Cardputer.Display.print("Bateria, Memoria, etc.");
+    
+    // Información de red
+    NetworkService& network = NetworkService::getInstance();
+    M5Cardputer.Display.setCursor(20, 120);
+    M5Cardputer.Display.print("Red: ");
+    M5Cardputer.Display.print(network.isConnected() ? "Conectado" : "Desconectado");
     
     // Mostrar instrucciones para volver
     M5Cardputer.Display.setCursor(20, 140);

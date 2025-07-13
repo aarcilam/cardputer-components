@@ -12,6 +12,7 @@ public:
     _menu->addButton("Configuracion", settingsCallback);
     _menu->addButton("Juegos", gamesCallback);
     _menu->addButton("Herramientas", toolsCallback);
+    _menu->addButton("Red", networkCallback);
     _menu->addButton("Sistema", systemCallback);
     _menu->addButton("Acerca de", aboutCallback);
   }
@@ -67,6 +68,12 @@ public:
   static void toolsCallback() {
     if (_instance) {
       _instance->navigate("/tools");
+    }
+  }
+  
+  static void networkCallback() {
+    if (_instance) {
+      _instance->navigate("/network");
     }
   }
   

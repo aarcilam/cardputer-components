@@ -8,6 +8,7 @@
 #include "views/system/SettingsView.h"
 #include "views/games/GameView.h"
 #include "views/tools/ToolsView.h"
+#include "views/tools/NetworkView.h"
 #include "views/system/SystemView.h"
 #include "views/about/AboutView.h"
 
@@ -19,6 +20,7 @@ OtherView* otherView;
 SettingsView* settingsView;
 GameView* gameView;
 ToolsView* toolsView;
+NetworkView* networkView;
 SystemView* systemView;
 AboutView* aboutView;
 
@@ -36,6 +38,7 @@ void setup() {
   settingsView = new SettingsView();
   gameView = new GameView();
   toolsView = new ToolsView();
+  networkView = new NetworkView();
   systemView = new SystemView();
   aboutView = new AboutView();
   
@@ -50,6 +53,7 @@ void setup() {
   router.addRoute("/settings", settingsView);
   router.addRoute("/games", gameView);
   router.addRoute("/tools", toolsView);
+  router.addRoute("/network", networkView);
   router.addRoute("/system", systemView);
   router.addRoute("/about", aboutView);
   
@@ -61,6 +65,7 @@ void setup() {
   settingsView->setRouter(&router);
   gameView->setRouter(&router);
   toolsView->setRouter(&router);
+  networkView->setRouter(&router);
   systemView->setRouter(&router);
   aboutView->setRouter(&router);
   

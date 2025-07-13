@@ -43,7 +43,7 @@ private:
   }
 
   void drawWifiStatus() {
-    int wifiX = M5Cardputer.Display.width() - 95;
+    int wifiX = M5Cardputer.Display.width() - 85;
     int wifiY = 5;
     uint32_t wifiColor;
 
