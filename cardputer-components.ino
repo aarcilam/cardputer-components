@@ -1,26 +1,14 @@
 #include <M5Cardputer.h>
 #include "Theme.h"
-#include "Title.h"
-#include "Menu.h"
+#include "ViewManager.h"
+#include "MenuView.h"
+#include "HelloView.h"
+#include "OtherView.h"
 
-Menu* menu;
-
-void sayHello() {
-  M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
-  M5Cardputer.Display.setCursor(20, 100);
-  M5Cardputer.Display.setTextSize(2);
-  M5Cardputer.Display.setTextColor(Theme::TEXT_COLOR);
-  M5Cardputer.Display.print("¡Hola Mundo!");
-  delay(1500);
-  M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
-  drawUI();
-}
-
-void drawUI() {
-  Title title("Menu Principal");
-  title.draw();
-  menu->draw();
-}
+ViewManager viewManager;
+MenuView* menuView;
+HelloView* helloView;
+OtherView* otherView;
 
 void setup() {
   M5Cardputer.begin();
@@ -28,18 +16,21 @@ void setup() {
   M5Cardputer.Display.setTextSize(Theme::FONT_NORMAL);
   M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
 
-  menu = new Menu(20, 40, 150);
-  menu->addButton("Saludar", sayHello);
-  menu->addButton("Otra opción", []() {
-    M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
-    M5Cardputer.Display.setCursor(20, 100);
-    M5Cardputer.Display.print("Elegiste otra opción");
-    delay(1500);
-    M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
-    drawUI();
-  });
-
-  drawUI();
+  // Crear las vistas
+  menuView = new MenuView();
+  helloView = new HelloView();
+  otherView = new OtherView();
+  
+  // Configurar la instancia estática de MenuView
+  MenuView::setInstance(menuView);
+  
+  // Configurar las referencias entre vistas
+  menuView->setViews(helloView, otherView);
+  helloView->setMenuView(menuView);
+  otherView->setMenuView(menuView);
+  
+  // Iniciar con la vista del menú
+  viewManager.setCurrentView(menuView);
 }
 
 void loop() {
@@ -50,15 +41,7 @@ void loop() {
     auto& word = M5Cardputer.Keyboard.keysState().word;
 
     for (char key : word) {
-      if (key == ';') {
-        menu->selectUp();
-      }
-      if (key == '.') {
-        menu->selectDown();
-      }
-      if (key == '\n' || key == '\r' || key == 'Enter' || key == 'OK' || key == '/') {
-        menu->activateSelected();
-      }
+      viewManager.handleInput(key);
     }
   }
 }
