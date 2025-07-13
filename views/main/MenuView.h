@@ -1,12 +1,12 @@
 #pragma once
 #include "../../core/RoutedView.h"
 #include "../../components/ui/ScrollableMenu.h"
-#include "../../components/ui/title.h"
+#include "../../components/ui/header.h"
 
 class MenuView : public RoutedView {
 public:
   MenuView() {
-    _menu = new ScrollableMenu(10, 30, M5Cardputer.Display.width() - 20, 3); // 3 opciones visibles a la vez
+    _menu = new ScrollableMenu(10, 35, M5Cardputer.Display.width() - 20, 3); // 3 opciones visibles a la vez, posicionado debajo del header
     _menu->addButton("Saludar", sayHelloCallback);
     _menu->addButton("Otra opcion", otherOptionCallback);
     _menu->addButton("Configuracion", settingsCallback);
@@ -22,8 +22,8 @@ public:
   
   void draw() override {
     M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
-    Title title("Menu Principal");
-    title.draw();
+    Header header("Menu Principal");
+    header.draw();
     _menu->draw();
   }
   
