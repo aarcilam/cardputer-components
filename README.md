@@ -1,6 +1,6 @@
 # Cardputer Components
 
-Sistema de componentes para M5Cardputer con sistema de rutas tipo Vue Router.
+An open source component system for M5Cardputer that helps you build apps quickly with a clean UI and easy routing.
 
 ## 📁 Estructura del Proyecto
 

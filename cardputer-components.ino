@@ -2,6 +2,7 @@
 #include "theme.h"
 #include "core/Router.h"
 #include "views/main/MenuView.h"
+#include "views/main/SplashView.h"
 #include "views/main/HelloView.h"
 #include "views/main/OtherView.h"
 #include "views/system/SettingsView.h"
@@ -11,6 +12,7 @@
 #include "views/about/AboutView.h"
 
 Router router;
+SplashView* splashView;
 MenuView* menuView;
 HelloView* helloView;
 OtherView* otherView;
@@ -27,6 +29,7 @@ void setup() {
   M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
 
   // Crear las vistas
+  splashView = new SplashView();
   menuView = new MenuView();
   helloView = new HelloView();
   otherView = new OtherView();
@@ -40,6 +43,7 @@ void setup() {
   MenuView::setInstance(menuView);
   
   // Configurar el router con las rutas
+  router.addRoute("/splash", splashView);
   router.addRoute("/", menuView);
   router.addRoute("/hello", helloView);
   router.addRoute("/other", otherView);
@@ -50,6 +54,7 @@ void setup() {
   router.addRoute("/about", aboutView);
   
   // Configurar las referencias al router en las vistas
+  splashView->setRouter(&router);
   menuView->setRouter(&router);
   helloView->setRouter(&router);
   otherView->setRouter(&router);
@@ -59,8 +64,8 @@ void setup() {
   systemView->setRouter(&router);
   aboutView->setRouter(&router);
   
-  // Iniciar con la vista del menú
-  router.setInitialRoute("/");
+  // Iniciar con la vista de splash
+  router.setInitialRoute("/splash");
 }
 
 void loop() {
