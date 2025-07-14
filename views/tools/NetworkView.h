@@ -39,36 +39,6 @@ public:
     M5Cardputer.Display.print("IP: ");
     M5Cardputer.Display.print(network.getIPAddress());
     
-    yPos += 15;
-    M5Cardputer.Display.setCursor(10, yPos);
-    M5Cardputer.Display.print("Señal: ");
-    M5Cardputer.Display.print(network.getSignalStrength());
-    M5Cardputer.Display.print(" dBm");
-    
-    yPos += 15;
-    M5Cardputer.Display.setCursor(10, yPos);
-    M5Cardputer.Display.print("Hora: ");
-    M5Cardputer.Display.print(_currentTime);
-    
-    yPos += 15;
-    M5Cardputer.Display.setCursor(10, yPos);
-    M5Cardputer.Display.print("Fecha: ");
-    M5Cardputer.Display.print(_currentDate);
-    
-    yPos += 25;
-    
-    // Botones de ejemplo
-    M5Cardputer.Display.setCursor(10, yPos);
-    M5Cardputer.Display.print("1. Test HTTP GET");
-    
-    yPos += 15;
-    M5Cardputer.Display.setCursor(10, yPos);
-    M5Cardputer.Display.print("2. Obtener Clima");
-    
-    yPos += 15;
-    M5Cardputer.Display.setCursor(10, yPos);
-    M5Cardputer.Display.print("3. Enviar Webhook");
-    
     // Mostrar respuesta si existe
     if (_showResponse && _lastResponse != "") {
       yPos += 25;
@@ -85,6 +55,21 @@ public:
       M5Cardputer.Display.print(shortResponse);
     }
     
+    yPos += 25;
+    
+    // Botones de ejemplo
+    M5Cardputer.Display.setCursor(10, yPos);
+    M5Cardputer.Display.print("1. Test HTTP GET");
+    
+    yPos += 15;
+    M5Cardputer.Display.setCursor(10, yPos);
+    M5Cardputer.Display.print("2. Obtener Clima");
+    
+    yPos += 15;
+    M5Cardputer.Display.setCursor(10, yPos);
+    M5Cardputer.Display.print("3. Enviar Webhook");
+    
+    
     // Instrucciones
     M5Cardputer.Display.setCursor(10, 140);
     M5Cardputer.Display.print("1-3: Acciones | Enter: Volver");
@@ -98,12 +83,14 @@ public:
         // Test HTTP GET
         _lastResponse = network.get("http://httpbin.org/get");
         _showResponse = true;
+        markForRedraw();
         break;
         
       case '2':
         // Obtener clima (necesitas una API key)
         _lastResponse = network.getWeather("Madrid", "TU_API_KEY_AQUI");
         _showResponse = true;
+        markForRedraw();
         break;
         
       case '3':
@@ -114,6 +101,7 @@ public:
           _lastResponse = "Error al enviar webhook";
         }
         _showResponse = true;
+        markForRedraw();
         break;
         
       case '\n':
