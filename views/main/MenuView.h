@@ -44,14 +44,18 @@ public:
   }
   
   void handleInput(char key) override {
+    int previousPage = _menu->getCurrentPage();
+    
     if (key == ';') {
       _menu->selectUp();
-      _needsFullRedraw = false; // Solo actualizar selección
+      int currentPage = _menu->getCurrentPage();
+      _needsFullRedraw = (currentPage != previousPage); // Redibujado completo si cambió de página
       markForRedraw();
     }
     if (key == '.') {
       _menu->selectDown();
-      _needsFullRedraw = false; // Solo actualizar selección
+      int currentPage = _menu->getCurrentPage();
+      _needsFullRedraw = (currentPage != previousPage); // Redibujado completo si cambió de página
       markForRedraw();
     }
     if (key == '\n' || key == '\r' || key == 'Enter' || key == 'OK' || key == '/') {

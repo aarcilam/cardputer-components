@@ -16,7 +16,32 @@ public:
   }
 
   void draw() {
-    // Limpiar área del menú
+    // Limpiar área del menú completamente
+    M5Cardputer.Display.fillRect(_x, _y, _w, _maxVisible * (_h + Theme::PADDING), Theme::BACKGROUND_COLOR);
+    
+    // Calcular el rango de botones a mostrar
+    int startIndex = (_selected / _maxVisible) * _maxVisible;
+    int endIndex = min(startIndex + _maxVisible, _buttons);
+    
+    // Dibujar solo los botones visibles en la página actual
+    for (int i = startIndex; i < endIndex; i++) {
+      int visibleIndex = i - startIndex;
+      int yPos = _y + visibleIndex * (_h + Theme::PADDING);
+      
+      // Crear botón temporal para dibujar
+      Button tempButton(_x, yPos, _w, _h, _labels[i]);
+      tempButton.onClick(_callbacks[i]);
+      tempButton.draw(i == _selected);
+    }
+    
+    // Mostrar indicador de scroll si hay más páginas
+    if (_buttons > _maxVisible) {
+      drawScrollIndicator();
+    }
+  }
+  
+  void drawSelectionOnly() {
+    // Limpiar completamente el área del menú antes de redibujar
     M5Cardputer.Display.fillRect(_x, _y, _w, _maxVisible * (_h + Theme::PADDING), Theme::BACKGROUND_COLOR);
     
     // Calcular el rango de botones a mostrar
@@ -37,25 +62,6 @@ public:
     // Mostrar indicador de scroll si hay más páginas
     if (_buttons > _maxVisible) {
       drawScrollIndicator();
-    }
-  }
-  
-  void drawSelectionOnly() {
-    // Solo redibujar el botón seleccionado y el anterior
-    int startIndex = (_selected / _maxVisible) * _maxVisible;
-    int endIndex = min(startIndex + _maxVisible, _buttons);
-    
-    for (int i = startIndex; i < endIndex; i++) {
-      int visibleIndex = i - startIndex;
-      int yPos = _y + visibleIndex * (_h + Theme::PADDING);
-      
-      // Limpiar solo el área del botón
-      M5Cardputer.Display.fillRect(_x, yPos, _w, _h, Theme::BACKGROUND_COLOR);
-      
-      // Crear botón temporal para dibujar
-      Button tempButton(_x, yPos, _w, _h, _labels[i]);
-      tempButton.onClick(_callbacks[i]);
-      tempButton.draw(i == _selected);
     }
   }
 
@@ -80,15 +86,28 @@ public:
     tempButton.showClickEffect();
     tempButton.click();
   }
+  
+  // Obtener la página actual
+  int getCurrentPage() const {
+    return _selected / _maxVisible;
+  }
 
 private:
   void drawScrollIndicator() {
     int totalPages = (_buttons + _maxVisible - 1) / _maxVisible;
     int currentPage = _selected / _maxVisible;
     
+    // Solo dibujar si hay más de una página
+    if (totalPages <= 1) {
+      return;
+    }
+    
     // Dibujar indicador de página en la esquina inferior derecha
     int indicatorX = _x + _w - 20;
-    int indicatorY = _y + _maxVisible * (_h + Theme::PADDING) - 10;
+    int indicatorY = _y + _maxVisible * (_h + Theme::PADDING) - 20;
+    
+    // Limpiar el área del indicador antes de dibujar
+    M5Cardputer.Display.fillRect(indicatorX - 5, indicatorY - 5, 25, 15, Theme::BACKGROUND_COLOR);
     
     M5Cardputer.Display.setTextSize(1);
     M5Cardputer.Display.setTextColor(Theme::TEXT_COLOR);
