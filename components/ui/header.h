@@ -29,7 +29,17 @@ public:
   }
 
   void retryWifiConnection() {
-    checkWifiConfig();
+    // Forzar reconexión WiFi
+    if (_hasWifiConfig && !_sdError) {
+      WiFi.disconnect();
+      delay(1000);
+      
+      String ssid, password;
+      SDCardService& sd = SDCardService::getInstance();
+      if (sd.readFileLines("/wificon.txt", ssid, password)) {
+        WiFi.begin(ssid.c_str(), password.c_str());
+      }
+    }
   }
 
   void updateWifiConnection() {
@@ -55,11 +65,26 @@ public:
       
       // Solo intentar hasta 5 veces para evitar bucle infinito
       if (retryCount <= 5) {
-        WiFi.disconnect();
-        delay(1000);
-        checkWifiConfig();
+        // Solo intentar reconectar si es posible
+        if (canConnectWiFi()) {
+          WiFi.disconnect();
+          delay(1000);
+          // Recargar configuración y reconectar
+          String ssid, password;
+          SDCardService& sd = SDCardService::getInstance();
+          if (sd.readFileLines("/wificon.txt", ssid, password)) {
+            WiFi.begin(ssid.c_str(), password.c_str());
+          }
+        }
       }
     }
+  }
+  
+  // Helper para verificar si WiFi está disponible para conectar
+  bool canConnectWiFi() {
+    wl_status_t status = WiFi.status();
+    // Solo conectar si no está conectado
+    return status != WL_CONNECTED;
   }
 
 private:
@@ -74,9 +99,14 @@ private:
     if(sd.exists("/wificon.txt")) {
       String ssid, password;
       if(sd.readFileLines("/wificon.txt", ssid, password)) {
-        WiFi.begin(ssid.c_str(), password.c_str());
+        // Solo cargar configuración, no iniciar conexión automáticamente
         _hasWifiConfig = true;
         _sdError = false;
+        
+        // Solo iniciar conexión si es posible
+        if (canConnectWiFi()) {
+          WiFi.begin(ssid.c_str(), password.c_str());
+        }
       } else {
         _sdError = true;
       }

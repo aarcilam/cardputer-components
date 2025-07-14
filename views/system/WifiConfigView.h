@@ -2,6 +2,7 @@
 #include "../../core/RoutedView.h"
 #include "../../components/ui/header.h"
 #include "../../core/SDCardService.h"
+#include "../../core/NetworkService.h"
 
 class WifiConfigView : public RoutedView {
 private:
@@ -18,7 +19,7 @@ public:
     Header header("Config WiFi");
     header.draw();
     
-    int yPos = 35;
+    int yPos = 35;      
     
     // Estado actual
     M5Cardputer.Display.setTextSize(1);
@@ -173,32 +174,22 @@ private:
     M5Cardputer.Display.setCursor(10, 60);
     M5Cardputer.Display.print("Reintentando conexion...");
     
-    WiFi.disconnect();
-    delay(2000);
+    NetworkService& network = NetworkService::getInstance();
     
-    if (loadWifiConfig()) {
-      WiFi.begin(_ssid.c_str(), _password.c_str());
-      
-      // Esperar hasta 10 segundos
-      int attempts = 0;
-      while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-        delay(500);
-        attempts++;
-        M5Cardputer.Display.setCursor(10, 80);
-        M5Cardputer.Display.print("Intento ");
-        M5Cardputer.Display.print(attempts);
-        M5Cardputer.Display.print("/20");
-      }
-      
+    if (network.reconnectWiFi()) {
+      M5Cardputer.Display.setCursor(10, 80);
+      M5Cardputer.Display.print("¡Conectado exitosamente!");
       M5Cardputer.Display.setCursor(10, 100);
-      if (WiFi.status() == WL_CONNECTED) {
-        M5Cardputer.Display.print("¡Conectado exitosamente!");
-      } else {
-        M5Cardputer.Display.print("Error de conexion");
-      }
-      
-      delay(2000);
+      M5Cardputer.Display.print("IP: ");
+      M5Cardputer.Display.print(network.getIPAddress());
+    } else {
+      M5Cardputer.Display.setCursor(10, 80);
+      M5Cardputer.Display.print("Error de conexion");
+      M5Cardputer.Display.setCursor(10, 100);
+      M5Cardputer.Display.print("Verifica configuracion");
     }
+    
+    delay(2000);
   }
   
   bool loadWifiConfig() {

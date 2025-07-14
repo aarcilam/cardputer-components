@@ -14,6 +14,45 @@ public:
   bool isConnected() {
     return WiFi.status() == WL_CONNECTED;
   }
+  
+  // Conectar WiFi con configuración desde SD
+  bool connectWiFi() {
+    SDCardService& sd = SDCardService::getInstance();
+    
+    if (!sd.isInitialized()) {
+      return false;
+    }
+    
+    if (!sd.exists("/wificon.txt")) {
+      return false;
+    }
+    
+    String ssid, password;
+    if (!sd.readFileLines("/wificon.txt", ssid, password)) {
+      return false;
+    }
+    
+    // Solo conectar si no está ya conectado
+    if (WiFi.status() != WL_CONNECTED) {
+      WiFi.begin(ssid.c_str(), password.c_str());
+      
+      // Esperar hasta 10 segundos
+      int attempts = 0;
+      while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+        delay(500);
+        attempts++;
+      }
+    }
+    
+    return WiFi.status() == WL_CONNECTED;
+  }
+  
+  // Reconectar WiFi
+  bool reconnectWiFi() {
+    WiFi.disconnect();
+    delay(1000);
+    return connectWiFi();
+  }
 
   // Obtener la dirección IP
   String getIPAddress() {
