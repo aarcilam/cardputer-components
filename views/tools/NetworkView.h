@@ -21,12 +21,9 @@ public:
     // Obtener instancia del servicio de red
     NetworkService& network = NetworkService::getInstance();
     
-    // Actualizar información cada 5 segundos
-    if (millis() - _lastUpdate > 5000) {
-      _currentTime = network.getCurrentTime();
-      _currentDate = network.getCurrentDate();
-      _lastUpdate = millis();
-    }
+    // Actualizar información constantemente
+    _currentTime = network.getCurrentTime();
+    _currentDate = network.getCurrentDate();
     
     int yPos = 35;
     

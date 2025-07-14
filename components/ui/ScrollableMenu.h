@@ -39,15 +39,34 @@ public:
       drawScrollIndicator();
     }
   }
+  
+  void drawSelectionOnly() {
+    // Solo redibujar el botón seleccionado y el anterior
+    int startIndex = (_selected / _maxVisible) * _maxVisible;
+    int endIndex = min(startIndex + _maxVisible, _buttons);
+    
+    for (int i = startIndex; i < endIndex; i++) {
+      int visibleIndex = i - startIndex;
+      int yPos = _y + visibleIndex * (_h + Theme::PADDING);
+      
+      // Limpiar solo el área del botón
+      M5Cardputer.Display.fillRect(_x, yPos, _w, _h, Theme::BACKGROUND_COLOR);
+      
+      // Crear botón temporal para dibujar
+      Button tempButton(_x, yPos, _w, _h, _labels[i]);
+      tempButton.onClick(_callbacks[i]);
+      tempButton.draw(i == _selected);
+    }
+  }
 
   void selectUp() {
     _selected = (_selected - 1 + _buttons) % _buttons;
-    draw();
+    // No llamar draw() aquí, se maneja desde la vista
   }
 
   void selectDown() {
     _selected = (_selected + 1) % _buttons;
-    draw();
+    // No llamar draw() aquí, se maneja desde la vista
   }
 
   void activateSelected() {

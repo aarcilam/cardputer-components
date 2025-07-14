@@ -19,6 +19,20 @@ public:
     _viewManager = manager;
   }
   
+  // Métodos para controlar el redibujo
+  virtual void clearScreen() {
+    M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
+  }
+  
+  virtual bool needsFullRedraw() {
+    return true; // Por defecto, redibujar todo
+  }
+  
+  virtual void drawPartial() {
+    // Por defecto, llamar al draw completo
+    draw();
+  }
+  
 protected:
   void changeView(View* newView);
   

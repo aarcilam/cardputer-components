@@ -5,7 +5,7 @@
 
 class Router {
 public:
-  Router() : _currentView(nullptr) {}
+  Router() : _currentView(nullptr), _needsRedraw(true) {}
   
   // Registrar una ruta con su vista
   void addRoute(const String& path, View* view) {
@@ -24,7 +24,7 @@ public:
       if (_currentView) {
         _currentView->setViewManager(nullptr); // El router maneja las vistas
         _currentView->onEnter();
-        _currentView->draw();
+        _needsRedraw = true; // Marcar para redibujar
       }
     }
   }
@@ -38,14 +38,27 @@ public:
   void handleInput(char key) {
     if (_currentView) {
       _currentView->handleInput(key);
+      // Solo marcar para redibujar si la vista lo solicita explícitamente
+      // Las vistas deben llamar markForRedraw() cuando necesiten actualizarse
     }
   }
   
   // Dibujar la vista actual
   void draw() {
-    if (_currentView) {
-      _currentView->draw();
+    if (_currentView && _needsRedraw) {
+      if (_currentView->needsFullRedraw()) {
+        _currentView->clearScreen();
+        _currentView->draw();
+      } else {
+        _currentView->drawPartial();
+      }
+      _needsRedraw = false; // Resetear flag después de dibujar
     }
+  }
+  
+  // Forzar redibujo
+  void forceRedraw() {
+    _needsRedraw = true;
   }
   
   // Establecer vista inicial
@@ -56,4 +69,5 @@ public:
 private:
   std::map<String, View*> _routes;
   View* _currentView;
+  bool _needsRedraw;
 }; 

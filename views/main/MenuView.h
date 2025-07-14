@@ -4,6 +4,9 @@
 #include "../../components/ui/header.h"
 
 class MenuView : public RoutedView {
+private:
+  bool _needsFullRedraw = true;
+
 public:
   MenuView() {
     _menu = new ScrollableMenu(10, 35, M5Cardputer.Display.width() - 20, 3); // 3 opciones visibles a la vez, posicionado debajo del header
@@ -13,6 +16,8 @@ public:
     _menu->addButton("Juegos", gamesCallback);
     _menu->addButton("Herramientas", toolsCallback);
     _menu->addButton("Red", networkCallback);
+    _menu->addButton("Config WiFi", wifiConfigCallback);
+    _menu->addButton("SD Card", sdCardCallback);
     _menu->addButton("Sistema", systemCallback);
     _menu->addButton("Acerca de", aboutCallback);
   }
@@ -28,16 +33,34 @@ public:
     _menu->draw();
   }
   
+  bool needsFullRedraw() override {
+    return _needsFullRedraw;
+  }
+  
+  void drawPartial() override {
+    // Solo redibujar la selección del menú, no limpiar toda la pantalla
+    _menu->drawSelectionOnly();
+    _needsFullRedraw = false;
+  }
+  
   void handleInput(char key) override {
     if (key == ';') {
       _menu->selectUp();
+      _needsFullRedraw = false; // Solo actualizar selección
+      markForRedraw();
     }
     if (key == '.') {
       _menu->selectDown();
+      _needsFullRedraw = false; // Solo actualizar selección
+      markForRedraw();
     }
     if (key == '\n' || key == '\r' || key == 'Enter' || key == 'OK' || key == '/') {
       _menu->activateSelected();
     }
+  }
+  
+  void onEnter() override {
+    _needsFullRedraw = true; // Redibujar completo al entrar
   }
   
   // Callbacks estáticos
@@ -74,6 +97,18 @@ public:
   static void networkCallback() {
     if (_instance) {
       _instance->navigate("/network");
+    }
+  }
+  
+  static void wifiConfigCallback() {
+    if (_instance) {
+      _instance->navigate("/wifi");
+    }
+  }
+  
+  static void sdCardCallback() {
+    if (_instance) {
+      _instance->navigate("/sd");
     }
   }
   

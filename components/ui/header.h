@@ -1,7 +1,7 @@
 #pragma once
 #include <M5Cardputer.h>
 #include <WiFi.h>
-#include <SD.h>
+#include "../../core/SDCardService.h"
 #include "../../theme.h"
 
 class Header {
@@ -11,6 +11,9 @@ public:
   }
 
   void draw() {
+    // Actualizar conexión WiFi
+    updateWifiConnection();
+    
     // Fondo del header
     M5Cardputer.Display.fillRect(0, 0, M5Cardputer.Display.width(), 25, Theme::PRIMARY_COLOR);
     
@@ -25,20 +28,60 @@ public:
     drawBattery();
   }
 
+  void retryWifiConnection() {
+    checkWifiConfig();
+  }
+
+  void updateWifiConnection() {
+    static unsigned long lastRetry = 0;
+    static int retryCount = 0;
+    const unsigned long retryInterval = 10000; // 10 segundos
+    
+    // Si no hay configuración WiFi, no hacer nada
+    if (!_hasWifiConfig || _sdError) {
+      return;
+    }
+    
+    // Si está conectado, resetear contador de intentos
+    if (WiFi.status() == WL_CONNECTED) {
+      retryCount = 0;
+      return;
+    }
+    
+    // Intentar reconectar cada 10 segundos
+    if (millis() - lastRetry > retryInterval) {
+      lastRetry = millis();
+      retryCount++;
+      
+      // Solo intentar hasta 5 veces para evitar bucle infinito
+      if (retryCount <= 5) {
+        WiFi.disconnect();
+        delay(1000);
+        checkWifiConfig();
+      }
+    }
+  }
+
 private:
   void checkWifiConfig() {
-    if(SD.exists("/wificon.txt")) {
-      File file = SD.open("/wificon.txt", FILE_READ);
-      if(file) {
-        String ssid = file.readStringUntil('\n');
-        String password = file.readStringUntil('\n');
-        ssid.trim();
-        password.trim();
-        file.close();
-        
+    SDCardService& sd = SDCardService::getInstance();
+    
+    if(!sd.isInitialized()) {
+      _sdError = true;
+      return;
+    }
+    
+    if(sd.exists("/wificon.txt")) {
+      String ssid, password;
+      if(sd.readFileLines("/wificon.txt", ssid, password)) {
         WiFi.begin(ssid.c_str(), password.c_str());
         _hasWifiConfig = true;
+        _sdError = false;
+      } else {
+        _sdError = true;
       }
+    } else {
+      _sdError = true;
     }
   }
 
@@ -46,13 +89,22 @@ private:
     int wifiX = M5Cardputer.Display.width() - 85;
     int wifiY = 5;
     uint32_t wifiColor;
+    static int blinkState = 0;
+    static unsigned long lastBlink = 0;
 
-    if(!_hasWifiConfig) {
-      wifiColor = 0xFFFFFF; // Blanco
+    if(_sdError) {
+      wifiColor = 0xFFFFFF; // Blanco - Error SD
+    } else if(!_hasWifiConfig) {
+      wifiColor = 0xFF8C00; // Naranja - Sin configuración
     } else if(WiFi.status() == WL_CONNECTED) {
-      wifiColor = 0x00FF00; // Verde
+      wifiColor = 0x00FF00; // Verde - Conectado
     } else {
-      wifiColor = 0xFF0000; // Rojo
+      // Rojo - Desconectado, con efecto de parpadeo
+      if (millis() - lastBlink > 500) {
+        blinkState = !blinkState;
+        lastBlink = millis();
+      }
+      wifiColor = blinkState ? 0xFF0000 : 0x800000; // Rojo parpadeante
     }
 
     // Dibujar icono WiFi
@@ -102,4 +154,5 @@ private:
 
   String _title;
   bool _hasWifiConfig = false;
+  bool _sdError = false;
 }; 

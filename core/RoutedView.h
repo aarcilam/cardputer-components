@@ -13,6 +13,13 @@ public:
     _router = router;
   }
   
+  // Marcar para redibujar
+  void markForRedraw() {
+    if (_router) {
+      _router->forceRedraw();
+    }
+  }
+  
 protected:
   // Métodos de navegación simplificados
   void navigate(const String& path) {
