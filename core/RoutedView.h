@@ -20,6 +20,11 @@ public:
     }
   }
   
+  // Refrescar solo el header (si existe)
+  void refreshHeader() {
+    // Esta función puede ser sobrescrita por las vistas que tengan header
+  }
+  
 protected:
   // Métodos de navegación simplificados
   void navigate(const String& path) {

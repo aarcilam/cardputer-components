@@ -33,6 +33,11 @@ public:
     draw();
   }
   
+  // Método para refrescar solo el header
+  virtual void refreshHeader() {
+    // Por defecto, no hacer nada
+  }
+  
 protected:
   void changeView(View* newView);
   

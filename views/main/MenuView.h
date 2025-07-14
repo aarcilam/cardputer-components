@@ -63,6 +63,12 @@ public:
     _needsFullRedraw = true; // Redibujar completo al entrar
   }
   
+  void refreshHeader() override {
+    // Refrescar solo el header sin afectar el menú
+    Header header("Menu Principal");
+    header.refreshHeader();
+  }
+  
   // Callbacks estáticos
   static void sayHelloCallback() {
     if (_instance) {

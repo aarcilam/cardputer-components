@@ -106,6 +106,13 @@ void loop() {
     }
   }
 
+  // Actualización periódica del header (cada 2 segundos)
+  static unsigned long lastHeaderUpdate = 0;
+  if (millis() - lastHeaderUpdate > 2000) {
+    lastHeaderUpdate = millis();
+    router.refreshHeader();
+  }
+
   // Redibujar la vista actual solo cuando es necesario
   router.draw();
 }

@@ -134,6 +134,12 @@ public:
         break;
     }
   }
+  
+  void refreshHeader() override {
+    // Refrescar solo el header sin afectar el contenido
+    Header header("Config WiFi");
+    header.refreshHeader();
+  }
 
 private:
   void drawOption(const String& text, int option, int y) {
@@ -182,6 +188,9 @@ private:
       M5Cardputer.Display.setCursor(10, 100);
       M5Cardputer.Display.print("IP: ");
       M5Cardputer.Display.print(network.getIPAddress());
+      
+      // Refrescar el header para mostrar el nuevo estado de WiFi
+      refreshHeader();
     } else {
       M5Cardputer.Display.setCursor(10, 80);
       M5Cardputer.Display.print("Error de conexion");

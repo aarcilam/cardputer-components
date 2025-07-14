@@ -61,6 +61,13 @@ public:
     _needsRedraw = true;
   }
   
+  // Refrescar solo el header
+  void refreshHeader() {
+    if (_currentView) {
+      _currentView->refreshHeader();
+    }
+  }
+  
   // Establecer vista inicial
   void setInitialRoute(const String& path) {
     navigate(path);

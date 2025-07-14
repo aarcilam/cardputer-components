@@ -27,6 +27,22 @@ public:
     drawWifiStatus();
     drawBattery();
   }
+  
+  // Método para refrescar solo el header
+  void refreshHeader() {
+    // Solo limpiar y redibujar el área del header
+    M5Cardputer.Display.fillRect(0, 0, M5Cardputer.Display.width(), 25, Theme::PRIMARY_COLOR);
+    
+    // Título
+    M5Cardputer.Display.setTextSize(Theme::FONT_HEADER);
+    M5Cardputer.Display.setTextColor(Theme::TEXT_COLOR);
+    M5Cardputer.Display.setCursor(10, 5);
+    M5Cardputer.Display.print(_title);
+    
+    // Indicadores
+    drawWifiStatus();
+    drawBattery();
+  }
 
   void retryWifiConnection() {
     // Forzar reconexión WiFi
@@ -38,6 +54,8 @@ public:
       SDCardService& sd = SDCardService::getInstance();
       if (sd.readFileLines("/wificon.txt", ssid, password)) {
         WiFi.begin(ssid.c_str(), password.c_str());
+        // Refrescar header después de iniciar conexión
+        refreshHeader();
       }
     }
   }
@@ -45,17 +63,33 @@ public:
   void updateWifiConnection() {
     static unsigned long lastRetry = 0;
     static int retryCount = 0;
+    static wl_status_t lastWiFiStatus = WL_DISCONNECTED;
     const unsigned long retryInterval = 10000; // 10 segundos
+    
+    // Verificar si el estado de WiFi cambió
+    wl_status_t currentWiFiStatus = WiFi.status();
+    bool statusChanged = (currentWiFiStatus != lastWiFiStatus);
     
     // Si no hay configuración WiFi, no hacer nada
     if (!_hasWifiConfig || _sdError) {
+      lastWiFiStatus = currentWiFiStatus;
       return;
     }
     
     // Si está conectado, resetear contador de intentos
-    if (WiFi.status() == WL_CONNECTED) {
+    if (currentWiFiStatus == WL_CONNECTED) {
       retryCount = 0;
+      // Si el estado cambió a conectado, refrescar header
+      if (statusChanged) {
+        refreshHeader();
+      }
+      lastWiFiStatus = currentWiFiStatus;
       return;
+    }
+    
+    // Si el estado cambió, refrescar header
+    if (statusChanged) {
+      refreshHeader();
     }
     
     // Intentar reconectar cada 10 segundos
@@ -78,6 +112,8 @@ public:
         }
       }
     }
+    
+    lastWiFiStatus = currentWiFiStatus;
   }
   
   // Helper para verificar si WiFi está disponible para conectar
