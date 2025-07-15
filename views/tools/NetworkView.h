@@ -72,7 +72,7 @@ public:
     
     // Instrucciones
     M5Cardputer.Display.setCursor(10, 140);
-    M5Cardputer.Display.print("1-3: Acciones | Enter: Volver");
+    M5Cardputer.Display.print("1-3: Acciones | Enter: Volver | Del: Volver");
   }
   
   void handleInput(char key) override {
@@ -103,14 +103,14 @@ public:
         _showResponse = true;
         markForRedraw();
         break;
-        
-      case '\n':
-      case '\r':
-      case 'Enter':
-      case 'OK':
-      case '/':
-        goBack();
-        break;
     }
+  }
+  
+  void onSelect() override {
+    goBack();
+  }
+  
+  void onGoBack() override {
+    goBack();
   }
 }; 

@@ -14,6 +14,23 @@ public:
   virtual void onEnter() {}
   virtual void onExit() {}
   
+  // Métodos de navegación del teclado
+  virtual void onSelect() {
+    // Por defecto, no hacer nada
+  }
+  
+  virtual void onGoBack() {
+    // Por defecto, no hacer nada
+  }
+  
+  virtual void onNavigateNext() {
+    // Por defecto, no hacer nada
+  }
+  
+  virtual void onNavigatePrev() {
+    // Por defecto, no hacer nada
+  }
+  
   // Callback para cambiar de vista
   void setViewManager(ViewManager* manager) {
     _viewManager = manager;

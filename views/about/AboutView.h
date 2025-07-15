@@ -23,12 +23,18 @@ public:
     
     // Mostrar instrucciones para volver
     M5Cardputer.Display.setCursor(20, 140);
-    M5Cardputer.Display.print("Presiona Enter para volver");
+    M5Cardputer.Display.print("Enter: Volver | Del: Volver");
+  }
+  
+  void onSelect() override {
+    goBack();
   }
   
   void handleInput(char key) override {
-    if (key == ',' ) {
-      goBack();
-    }
+    // No necesitamos manejar input específico aquí
+  }
+  
+  void onGoBack() override {
+    goBack();
   }
 }; 

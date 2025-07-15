@@ -2,6 +2,7 @@
 #include "theme.h"
 #include "core/Router.h"
 #include "core/SDCardService.h"
+#include "core/KeyboardService.h"
 #include "views/main/MenuView.h"
 #include "views/main/SplashView.h"
 #include "views/main/HelloView.h"
@@ -43,6 +44,10 @@ void setup() {
     M5Cardputer.Display.print("Error: SD no disponible");
     delay(2000);
   }
+  
+  // Inicializar servicio de teclado
+  KeyboardService& keyboard = KeyboardService::getInstance();
+  keyboard.begin();
 
   // Crear las vistas
   splashView = new SplashView();
@@ -94,17 +99,8 @@ void setup() {
 }
 
 void loop() {
-  M5Cardputer.update();
-
-  // Manejar input del teclado
-  if (M5Cardputer.Keyboard.isChange()) {
-    M5Cardputer.Keyboard.updateKeysState();
-    auto& word = M5Cardputer.Keyboard.keysState().word;
-
-    for (char key : word) {
-      router.handleInput(key);
-    }
-  }
+  // Actualizar el servicio de teclado (esto también actualiza M5Cardputer)
+  router.updateKeyboard();
 
   // Actualización periódica del header (cada 2 segundos)
   static unsigned long lastHeaderUpdate = 0;

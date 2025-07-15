@@ -2,6 +2,7 @@
 #include "../../core/RoutedView.h"
 #include "../../components/ui/ScrollableMenu.h"
 #include "../../components/ui/header.h"
+#include "../../core/KeyboardService.h"
 
 class MenuView : public RoutedView {
 private:
@@ -44,23 +45,28 @@ public:
   }
   
   void handleInput(char key) override {
+    // El KeyboardService maneja la mayoría de las teclas
+    // Este método se mantiene para compatibilidad con teclas específicas
+  }
+  
+  void onSelect() override {
+    _menu->activateSelected();
+  }
+  
+  void onNavigateNext() override {
     int previousPage = _menu->getCurrentPage();
-    
-    if (key == ';') {
-      _menu->selectUp();
-      int currentPage = _menu->getCurrentPage();
-      _needsFullRedraw = (currentPage != previousPage); // Redibujado completo si cambió de página
-      markForRedraw();
-    }
-    if (key == '.') {
-      _menu->selectDown();
-      int currentPage = _menu->getCurrentPage();
-      _needsFullRedraw = (currentPage != previousPage); // Redibujado completo si cambió de página
-      markForRedraw();
-    }
-    if (key == '\n' || key == '\r' || key == 'Enter' || key == 'OK' || key == '/') {
-      _menu->activateSelected();
-    }
+    _menu->selectDown();
+    int currentPage = _menu->getCurrentPage();
+    _needsFullRedraw = (currentPage != previousPage);
+    markForRedraw();
+  }
+  
+  void onNavigatePrev() override {
+    int previousPage = _menu->getCurrentPage();
+    _menu->selectUp();
+    int currentPage = _menu->getCurrentPage();
+    _needsFullRedraw = (currentPage != previousPage);
+    markForRedraw();
   }
   
   void onEnter() override {

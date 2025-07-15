@@ -79,32 +79,40 @@ public:
     
     // Instrucciones
     M5Cardputer.Display.setCursor(10, 140);
-    M5Cardputer.Display.print("1-6: Acciones | Enter: Seleccionar | /: Volver");
+    M5Cardputer.Display.print("1-6: Acciones | ;/. Navegar | Enter: Seleccionar | Del: Volver");
   }
   
   void handleInput(char key) override {
+    // Manejar teclas específicas para opciones
     switch (key) {
-      case ';':
-        _selectedOption = (_selectedOption - 1 + _maxOptions) % _maxOptions;
-        markForRedraw();
-        break;
-        
-      case '.':
-        _selectedOption = (_selectedOption + 1) % _maxOptions;
-        markForRedraw();
-        break;
-        
-      case '\n':
-      case '\r':
-      case 'Enter':
-      case '/':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+        _selectedOption = key - '1';
         executeSelectedOption();
         break;
-        
-      case ',':
-        goBack();
-        break;
     }
+  }
+  
+  void onSelect() override {
+    executeSelectedOption();
+  }
+  
+  void onNavigateNext() override {
+    _selectedOption = (_selectedOption + 1) % _maxOptions;
+    markForRedraw();
+  }
+  
+  void onNavigatePrev() override {
+    _selectedOption = (_selectedOption - 1 + _maxOptions) % _maxOptions;
+    markForRedraw();
+  }
+  
+  void onGoBack() override {
+    goBack();
   }
 
 private:

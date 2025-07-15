@@ -41,6 +41,10 @@ public:
   }
   
   void handleInput(char key) override {
+    // No necesitamos manejar input específico aquí
+  }
+  
+  void onSelect() override {
     // Permitir saltar la pantalla de splash con cualquier tecla
     navigate("/");
   }

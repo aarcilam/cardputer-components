@@ -2,6 +2,7 @@
 #include <map>
 #include <functional>
 #include "View.h"
+#include "KeyboardService.h"
 
 class Router {
 public:
@@ -24,6 +25,7 @@ public:
       if (_currentView) {
         _currentView->setViewManager(nullptr); // El router maneja las vistas
         _currentView->onEnter();
+        setupKeyboardCallbacks(); // Configurar callbacks del teclado
         _needsRedraw = true; // Marcar para redibujar
       }
     }
@@ -41,6 +43,54 @@ public:
       // Solo marcar para redibujar si la vista lo solicita explícitamente
       // Las vistas deben llamar markForRedraw() cuando necesiten actualizarse
     }
+  }
+  
+  // Configurar callbacks del teclado para la vista actual
+  void setupKeyboardCallbacks() {
+    KeyboardService& keyboard = KeyboardService::getInstance();
+    
+    // Configurar callbacks basados en la vista actual
+    if (_currentView) {
+      keyboard.setOnSelect([this]() {
+        if (_currentView) {
+          _currentView->onSelect();
+          _needsRedraw = true;
+        }
+      });
+      
+      keyboard.setOnGoBack([this]() {
+        if (_currentView) {
+          _currentView->onGoBack();
+          _needsRedraw = true;
+        }
+      });
+      
+      keyboard.setOnNavigateNext([this]() {
+        if (_currentView) {
+          _currentView->onNavigateNext();
+          _needsRedraw = true;
+        }
+      });
+      
+      keyboard.setOnNavigatePrev([this]() {
+        if (_currentView) {
+          _currentView->onNavigatePrev();
+          _needsRedraw = true;
+        }
+      });
+      
+      keyboard.setOnKeyPressed([this](char key) {
+        if (_currentView) {
+          _currentView->handleInput(key);
+          _needsRedraw = true;
+        }
+      });
+    }
+  }
+  
+  // Actualizar el servicio de teclado
+  void updateKeyboard() {
+    KeyboardService::getInstance().update();
   }
   
   // Dibujar la vista actual
