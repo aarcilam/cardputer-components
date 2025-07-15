@@ -17,6 +17,7 @@ public:
     _menu->addButton("Juegos", gamesCallback);
     _menu->addButton("Herramientas", toolsCallback);
     _menu->addButton("Red", networkCallback);
+    _menu->addButton("Home Assistant", homeAssistantCallback);
     _menu->addButton("Config WiFi", wifiConfigCallback);
     _menu->addButton("SD Card", sdCardCallback);
     _menu->addButton("Sistema", systemCallback);
@@ -137,6 +138,12 @@ public:
   static void aboutCallback() {
     if (_instance) {
       _instance->navigate("/about");
+    }
+  }
+  
+  static void homeAssistantCallback() {
+    if (_instance) {
+      _instance->navigate("/homeassistant");
     }
   }
   
