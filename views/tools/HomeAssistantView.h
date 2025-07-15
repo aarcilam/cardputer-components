@@ -94,8 +94,8 @@ public:
     
     switch (key) {
       case '1':
-        // Obtener todos los estados
-        _lastResponse = ha.getAllStates();
+        // Obtener estado de la lámpara
+        _lastResponse = ha.getState("light.lampara_sala");
         _showResponse = true;
         markForRedraw();
         break;
@@ -103,7 +103,7 @@ public:
       case '2':
         // Encender una luz (ejemplo genérico)
         {
-          String jsonData = "{\"entity_id\": \"light.living_room\"}";
+          String jsonData = "{\"entity_id\": \"light.lampara_sala\"}";
           _lastResponse = ha.callService("light", "turn_on", jsonData);
           _showResponse = true;
           markForRedraw();
@@ -113,7 +113,7 @@ public:
       case '3':
         // Apagar una luz (ejemplo genérico)
         {
-          String jsonData = "{\"entity_id\": \"light.living_room\"}";
+          String jsonData = "{\"entity_id\": \"light.lampara_sala\"}";
           _lastResponse = ha.callService("light", "turn_off", jsonData);
           _showResponse = true;
           markForRedraw();
