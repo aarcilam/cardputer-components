@@ -20,6 +20,7 @@ public:
     _menu->addButton("Config WiFi", wifiConfigCallback);
     _menu->addButton("SD Card", sdCardCallback);
     _menu->addButton("Sistema", systemCallback);
+    _menu->addButton("Formulario", formCallback);
     _menu->addButton("Acerca de", aboutCallback);
   }
   
@@ -131,6 +132,12 @@ public:
   static void systemCallback() {
     if (_instance) {
       _instance->navigate("/system");
+    }
+  }
+  
+  static void formCallback() {
+    if (_instance) {
+      _instance->navigate("/form");
     }
   }
   
