@@ -60,23 +60,26 @@ public:
         _showCursor = true;
         _lastBlinkTime = millis();
         
-        // Configurar callbacks del KeyboardService
+        // Configurar callbacks del KeyboardService para manejar entrada de texto
         KeyboardService& keyboard = KeyboardService::getInstance();
         
+        // Configurar callback de teclas presionadas
+        keyboard.setOnKeyPressed([this](char key) {
+            handleKeyPress(key);
+        });
+        
+        // Configurar callback de Enter para confirmar
         keyboard.setOnSelect([this]() {
             if (_onConfirmCallback) {
                 _onConfirmCallback(_text);
             }
         });
         
+        // Configurar callback de Del para cancelar
         keyboard.setOnGoBack([this]() {
             if (_onCancelCallback) {
                 _onCancelCallback();
             }
-        });
-        
-        keyboard.setOnKeyPressed([this](char key) {
-            handleKeyPress(key);
         });
     }
     
@@ -86,7 +89,7 @@ public:
     void deactivate() {
         _isActive = false;
         
-        // Limpiar callbacks del KeyboardService
+        // Limpiar todos los callbacks del KeyboardService
         KeyboardService& keyboard = KeyboardService::getInstance();
         keyboard.clearCallbacks();
     }
@@ -213,12 +216,6 @@ private:
                 if (_cursorPosition > 0) {
                     _text.remove(_cursorPosition - 1, 1);
                     _cursorPosition--;
-                }
-                break;
-                
-            case 13: // Enter
-                if (_onConfirmCallback) {
-                    _onConfirmCallback(_text);
                 }
                 break;
                 

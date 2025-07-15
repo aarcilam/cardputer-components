@@ -24,12 +24,13 @@ private:
     int _currentField;
     int _totalFields;
     bool _showResults;
+    bool _editingField;
     
     // Resultados
     String _formData[4]; // name, email, age, phone
 
 public:
-    FormView() : _currentField(0), _totalFields(4), _showResults(false) {
+    FormView() : _currentField(0), _totalFields(4), _showResults(false), _editingField(false) {
         // Crear campos de entrada
         _nameField = new InputText(10, 40, 140, 20, "Nombre", 30);
         _emailField = new InputText(10, 70, 140, 20, "Email", 50);
@@ -56,9 +57,6 @@ public:
         
         // Configurar callbacks
         setupFieldCallbacks();
-        
-        // Activar el primer campo
-        activateCurrentField();
     }
     
     ~FormView() {
@@ -84,7 +82,37 @@ public:
     void onEnter() override {
         _currentField = 0;
         _showResults = false;
-        activateCurrentField();
+        _editingField = false;
+        
+        // Configurar callbacks del KeyboardService para navegación
+        KeyboardService& keyboard = KeyboardService::getInstance();
+        keyboard.clearCallbacks();
+        
+        keyboard.setOnSelect([this]() {
+            if (!_editingField) {
+                startEditingCurrentField();
+            }
+        });
+        
+        keyboard.setOnGoBack([this]() {
+            if (_editingField) {
+                stopEditingCurrentField();
+            } else {
+                goBack();
+            }
+        });
+        
+        keyboard.setOnNavigateNext([this]() {
+            if (!_editingField) {
+                _currentField = (_currentField + 1) % _totalFields;
+            }
+        });
+        
+        keyboard.setOnNavigatePrev([this]() {
+            if (!_editingField) {
+                _currentField = (_currentField - 1 + _totalFields) % _totalFields;
+            }
+        });
     }
     
     void onExit() override {
@@ -93,44 +121,27 @@ public:
         _emailField->deactivate();
         _ageField->deactivate();
         _phoneField->deactivate();
-    }
-    
-    void onNavigateNext() override {
-        if (!_showResults) {
-            _currentField = (_currentField + 1) % _totalFields;
-            activateCurrentField();
-        }
-    }
-    
-    void onNavigatePrev() override {
-        if (!_showResults) {
-            _currentField = (_currentField - 1 + _totalFields) % _totalFields;
-            activateCurrentField();
-        }
-    }
-    
-    void onSelect() override {
-        if (_showResults) {
-            // Volver al formulario
-            _showResults = false;
-            activateCurrentField();
-        } else {
-            // Activar el campo actual
-            activateCurrentField();
-        }
-    }
-    
-    void onGoBack() override {
-        if (_showResults) {
-            _showResults = false;
-            activateCurrentField();
-        } else {
-            goBack();
-        }
+        _editingField = false;
     }
     
     void handleInput(char key) override {
-        // Manejar teclas específicas si es necesario
+        // Si estamos editando un campo, el InputText manejará la entrada
+        if (_editingField) {
+            return;
+        }
+        
+        // Si no estamos editando, manejar navegación con teclas directas
+        switch (key) {
+            case ';': // Subir
+                _currentField = (_currentField - 1 + _totalFields) % _totalFields;
+                break;
+            case '.': // Bajar
+                _currentField = (_currentField + 1) % _totalFields;
+                break;
+            case 13: // Enter
+                startEditingCurrentField();
+                break;
+        }
     }
 
 private:
@@ -138,31 +149,37 @@ private:
         // Callback para el campo nombre
         _nameField->setOnConfirm([this](String text) {
             _formData[0] = text;
-            nextField();
+            _currentField = 1; // Ir al siguiente campo
+            stopEditingCurrentField();
+            startEditingCurrentField();
         });
         
         _nameField->setOnCancel([this]() {
-            cancelField();
+            stopEditingCurrentField();
         });
         
         // Callback para el campo email
         _emailField->setOnConfirm([this](String text) {
             _formData[1] = text;
-            nextField();
+            _currentField = 2; // Ir al siguiente campo
+            stopEditingCurrentField();
+            startEditingCurrentField();
         });
         
         _emailField->setOnCancel([this]() {
-            cancelField();
+            stopEditingCurrentField();
         });
         
         // Callback para el campo edad
         _ageField->setOnConfirm([this](String text) {
             _formData[2] = text;
-            nextField();
+            _currentField = 3; // Ir al siguiente campo
+            stopEditingCurrentField();
+            startEditingCurrentField();
         });
         
         _ageField->setOnCancel([this]() {
-            cancelField();
+            stopEditingCurrentField();
         });
         
         // Callback para el campo teléfono
@@ -172,16 +189,18 @@ private:
         });
         
         _phoneField->setOnCancel([this]() {
-            cancelField();
+            stopEditingCurrentField();
         });
     }
     
-    void activateCurrentField() {
-        // Desactivar todos los campos
-        _nameField->deactivate();
-        _emailField->deactivate();
-        _ageField->deactivate();
-        _phoneField->deactivate();
+    void startEditingCurrentField() {
+        if (_editingField) return;
+        
+        _editingField = true;
+        
+        // Limpiar callbacks de navegación para que el InputText los configure
+        KeyboardService& keyboard = KeyboardService::getInstance();
+        keyboard.clearCallbacks();
         
         // Activar el campo actual
         switch (_currentField) {
@@ -200,18 +219,57 @@ private:
         }
     }
     
-    void nextField() {
-        _currentField = (_currentField + 1) % _totalFields;
-        activateCurrentField();
-    }
-    
-    void cancelField() {
-        // Mantener el campo actual activo
-        activateCurrentField();
+    void stopEditingCurrentField() {
+        if (!_editingField) return;
+        
+        _editingField = false;
+        
+        // Desactivar todos los campos (esto también limpia sus callbacks)
+        _nameField->deactivate();
+        _emailField->deactivate();
+        _ageField->deactivate();
+        _phoneField->deactivate();
+        
+        // Restaurar callbacks de navegación
+        KeyboardService& keyboard = KeyboardService::getInstance();
+        keyboard.clearCallbacks();
+        
+        keyboard.setOnSelect([this]() {
+            if (!_editingField) {
+                startEditingCurrentField();
+            }
+        });
+        
+        keyboard.setOnGoBack([this]() {
+            if (_editingField) {
+                stopEditingCurrentField();
+            } else {
+                goBack();
+            }
+        });
+        
+        keyboard.setOnNavigateNext([this]() {
+            if (!_editingField) {
+                _currentField = (_currentField + 1) % _totalFields;
+            }
+        });
+        
+        keyboard.setOnNavigatePrev([this]() {
+            if (!_editingField) {
+                _currentField = (_currentField - 1 + _totalFields) % _totalFields;
+            }
+        });
     }
     
     void submitForm() {
         _showResults = true;
+        _editingField = false;
+        
+        // Desactivar todos los campos
+        _nameField->deactivate();
+        _emailField->deactivate();
+        _ageField->deactivate();
+        _phoneField->deactivate();
         
         // Configurar callbacks para la vista de resultados
         KeyboardService& keyboard = KeyboardService::getInstance();
@@ -219,12 +277,12 @@ private:
         
         keyboard.setOnSelect([this]() {
             _showResults = false;
-            activateCurrentField();
+            onEnter(); // Restaurar estado inicial
         });
         
         keyboard.setOnGoBack([this]() {
             _showResults = false;
-            activateCurrentField();
+            onEnter(); // Restaurar estado inicial
         });
     }
     
@@ -254,16 +312,22 @@ private:
         _ageField->draw();
         _phoneField->draw();
         
-        // Indicador de campo actual
-        int indicatorY = 40 + (_currentField * 30);
-        M5Cardputer.Display.setTextColor(Theme::ACCENT_COLOR);
-        M5Cardputer.Display.setCursor(5, indicatorY);
-        M5Cardputer.Display.print(">");
+        // Indicador de campo actual (solo si no estamos editando)
+        if (!_editingField) {
+            int indicatorY = 40 + (_currentField * 30);
+            M5Cardputer.Display.setTextColor(Theme::ACCENT_COLOR);
+            M5Cardputer.Display.setCursor(5, indicatorY);
+            M5Cardputer.Display.print(">");
+        }
         
         // Instrucciones
         M5Cardputer.Display.setTextColor(Theme::SECONDARY_TEXT_COLOR);
         M5Cardputer.Display.setCursor(10, 160);
-        M5Cardputer.Display.print(";/. Navegar | Enter: Editar | Del: Volver");
+        if (_editingField) {
+            M5Cardputer.Display.print("Escribiendo... | Enter: Confirmar | Del: Cancelar");
+        } else {
+            M5Cardputer.Display.print(";/. Navegar | Enter: Editar | Del: Volver");
+        }
     }
     
     void drawResults() {
