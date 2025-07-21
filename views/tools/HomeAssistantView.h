@@ -1,6 +1,7 @@
 #pragma once
 #include "../../core/RoutedView.h"
 #include "../../components/ui/header.h"
+#include "../../components/ui/ModalMessage.h"
 #include "../../core/HomeAssistantService.h"
 #include "../../core/NetworkService.h"
 
@@ -9,6 +10,7 @@ private:
   String _lastResponse = "";
   bool _showResponse = false;
   bool _isConfigured = false;
+  ModalMessage _modal;
 
 public:
   void onEnter() override {
@@ -21,6 +23,9 @@ public:
   }
 
   void draw() override {
+    // Actualizar el modal antes de dibujar
+    _modal.update();
+    
     M5Cardputer.Display.fillScreen(Theme::BACKGROUND_COLOR);
     
     Header header("Home Assistant");
@@ -80,12 +85,22 @@ public:
     // Instrucciones
     M5Cardputer.Display.setCursor(10, 140);
     M5Cardputer.Display.print("1-4: Acciones | Enter: Volver");
+    
+    // Dibujar el modal si está visible
+    _modal.draw();
   }
   
   void handleInput(char key) override {
+    // Si el modal está visible, delegar la entrada al modal
+    if (_modal.isVisible()) {
+      if (_modal.handleInput(key)) {
+        markForRedraw();
+      }
+      return;
+    }
+    
     if (!NetworkService::getInstance().isConnected()) {
-      _lastResponse = "ERROR: Sin conexion WiFi";
-      _showResponse = true;
+      _modal.showError("Sin conexion WiFi");
       markForRedraw();
       return;
     }
@@ -96,6 +111,11 @@ public:
       case '1':
         // Obtener estado de la lámpara
         _lastResponse = ha.getState("light.lampara_sala");
+        if (_lastResponse.indexOf("error") == -1 && _lastResponse.length() > 0) {
+          _modal.showSuccess("Estado obtenido correctamente");
+        } else {
+          _modal.showError("Error al obtener estado");
+        }
         _showResponse = true;
         markForRedraw();
         break;
@@ -105,6 +125,11 @@ public:
         {
           String jsonData = "{\"entity_id\": \"light.lampara_sala\"}";
           _lastResponse = ha.callService("light", "turn_on", jsonData);
+          if (_lastResponse.indexOf("error") == -1 && _lastResponse.length() > 0) {
+            _modal.showSuccess("Luz encendida correctamente");
+          } else {
+            _modal.showError("Error al encender la luz");
+          }
           _showResponse = true;
           markForRedraw();
         }
@@ -115,6 +140,11 @@ public:
         {
           String jsonData = "{\"entity_id\": \"light.lampara_sala\"}";
           _lastResponse = ha.callService("light", "turn_off", jsonData);
+          if (_lastResponse.indexOf("error") == -1 && _lastResponse.length() > 0) {
+            _modal.showSuccess("Luz apagada correctamente");
+          } else {
+            _modal.showError("Error al apagar la luz");
+          }
           _showResponse = true;
           markForRedraw();
         }
@@ -123,6 +153,11 @@ public:
       case '4':
         // Obtener estado de un sensor específico
         _lastResponse = ha.getState("sensor.temperature");
+        if (_lastResponse.indexOf("error") == -1 && _lastResponse.length() > 0) {
+          _modal.showInfo("Estado del sensor obtenido");
+        } else {
+          _modal.showError("Error al obtener sensor");
+        }
         _showResponse = true;
         markForRedraw();
         break;
