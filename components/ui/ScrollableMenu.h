@@ -8,10 +8,31 @@ public:
     : _x(x), _y(y), _w(w), _maxVisible(maxVisible) {}
 
   void addButton(const String& label, void (*callback)()) {
+    addButton(label, callback, ""); // Sin entity ID por defecto
+  }
+
+  void addButton(const String& label, void (*callback)(), const String& entityId) {
     if (_buttons < 20) { // Límite de botones
       _labels[_buttons] = label;
       _callbacks[_buttons] = callback;
+      _entityIds[_buttons] = entityId;
+      _buttonColors[_buttons] = 0; // Color por defecto (sin color personalizado)
       _buttons++;
+    }
+  }
+
+  void setButtonStateColor(int index, uint32_t color) {
+    if (index >= 0 && index < _buttons) {
+      _buttonColors[index] = color;
+    }
+  }
+
+  void setButtonStateColor(const String& entityId, uint32_t color) {
+    for (int i = 0; i < _buttons; i++) {
+      if (_entityIds[i] == entityId) {
+        _buttonColors[i] = color;
+        break;
+      }
     }
   }
 
@@ -31,6 +52,12 @@ public:
       // Crear botón temporal para dibujar
       Button tempButton(_x, yPos, _w, _h, _labels[i]);
       tempButton.onClick(_callbacks[i]);
+      
+      // Establecer color personalizado si existe
+      if (_buttonColors[i] != 0) {
+        tempButton.setStateColor(_buttonColors[i]);
+      }
+      
       tempButton.draw(i == _selected);
     }
     
@@ -56,6 +83,12 @@ public:
       // Crear botón temporal para dibujar
       Button tempButton(_x, yPos, _w, _h, _labels[i]);
       tempButton.onClick(_callbacks[i]);
+      
+      // Establecer color personalizado si existe
+      if (_buttonColors[i] != 0) {
+        tempButton.setStateColor(_buttonColors[i]);
+      }
+      
       tempButton.draw(i == _selected);
     }
     
@@ -83,6 +116,12 @@ public:
     
     Button tempButton(_x, yPos, _w, _h, _labels[_selected]);
     tempButton.onClick(_callbacks[_selected]);
+    
+    // Establecer color personalizado si existe
+    if (_buttonColors[_selected] != 0) {
+      tempButton.setStateColor(_buttonColors[_selected]);
+    }
+    
     tempButton.showClickEffect();
     tempButton.click();
   }
@@ -90,6 +129,14 @@ public:
   // Obtener la página actual
   int getCurrentPage() const {
     return _selected / _maxVisible;
+  }
+
+  // Obtener entity ID de un botón
+  String getEntityId(int index) const {
+    if (index >= 0 && index < _buttons) {
+      return _entityIds[index];
+    }
+    return "";
   }
 
 private:
@@ -121,6 +168,8 @@ private:
   int _maxVisible;
   String _labels[20]; // Almacenar las etiquetas
   void (*_callbacks[20])() = {nullptr}; // Almacenar los callbacks
+  String _entityIds[20]; // Almacenar los entity IDs para actualizar estados
+  uint32_t _buttonColors[20]; // Almacenar colores personalizados por estado
   int _buttons = 0;
   int _selected = 0;
 }; 
