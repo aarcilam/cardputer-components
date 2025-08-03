@@ -16,6 +16,7 @@
 #include "views/system/SDCardView.h"
 #include "views/about/AboutView.h"
 #include "views/examples/FormView.h"
+#include "views/tools/HomeAssistantView.h"
 
 Router router;
 SplashView* splashView;
@@ -31,6 +32,7 @@ WifiConfigView* wifiConfigView;
 SDCardView* sdCardView;
 AboutView* aboutView;
 FormView* formView;
+HomeAssistantView* homeAssistantView;
 
 void setup() {
   M5Cardputer.begin();
@@ -65,6 +67,7 @@ void setup() {
   sdCardView = new SDCardView();
   aboutView = new AboutView();
   formView = new FormView();
+  homeAssistantView = new HomeAssistantView();
   
   // Configurar la instancia estática de MenuView
   MenuView::setInstance(menuView);
@@ -83,6 +86,7 @@ void setup() {
   router.addRoute("/sd", sdCardView);
   router.addRoute("/about", aboutView);
   router.addRoute("/form", formView);
+  router.addRoute("/homeassistant", homeAssistantView);
   
   // Configurar las referencias al router en las vistas
   splashView->setRouter(&router);
@@ -98,6 +102,7 @@ void setup() {
   sdCardView->setRouter(&router);
   aboutView->setRouter(&router);
   formView->setRouter(&router);
+  homeAssistantView->setRouter(&router);
   
   // Iniciar con la vista de splash
   router.setInitialRoute("/splash");

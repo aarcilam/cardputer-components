@@ -1,1 +1,3 @@
-/build
+build/*
+haos.txt
+wificon.txt
